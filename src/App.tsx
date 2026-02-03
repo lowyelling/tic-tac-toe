@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createGame, makeMove } from "./tic-tac-toe";
+import { createGame, makeMove, getWinner } from "./tic-tac-toe";
 
 function App() {
   let [gameState, setGameState] = useState(getInitialGame())
@@ -19,6 +19,9 @@ function App() {
          </tr>
       </table>
       <div>Hello World! current player: {gameState.currentPlayer}</div>
+      {getWinner(gameState) &&
+        <div>Winner: {getWinner(gameState)} </div>
+      }
     </>
   )
   
