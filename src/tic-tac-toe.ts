@@ -16,6 +16,17 @@ export type GameState = {
   currentPlayer: Player;
 };
 
+const WINNING_LINES: [number, number, number][] = [
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8],
+  [0, 4, 8],
+  [2, 4, 6],
+]
+
 export function createGame(): GameState {
   return {
     board: [null, null, null, null, null, null, null, null, null],
@@ -57,61 +68,23 @@ export function makeMove(state: GameState, position: number): GameState {
 }
 
 export function getWinner(state: GameState): Player | null {
-
-  // empty board - copied every function test case logic 
-  if (state.board.every(cell => cell === null)) {
-    return null
+  for (const [a, b, c] of WINNING_LINES) {
+    const cell = state.board[a];
+    if (cell && cell === state.board[b] && cell === state.board[c]) {
+      return cell;
+    }
   }
 
-  // All winning combinations - this is inefficient - can fix later
-  // "detects winning with the top row"
+  return null;
+}
 
-  if (state.board[0] && state.board[0] === state.board[1] && state.board[1] === state.board[2]) {
-    return state.board[0]
+export function getWin(state: GameState): Player | null {
+  for (const [a, b, c] of WINNING_LINES) {
+    const cell = state.board[a] 
+    if (cell && cell === state.board[b] && cell === state.board[c]) {
+      return cell
+    }
   }
 
-  // "detects winning with the middle row"
-
-  if (state.board[3] && state.board[3] === state.board[4] && state.board[4] === state.board[5]) {
-    return state.board[3]
-  }
-
-  // "detects winning with the bottom row"
-  if (state.board[6] && state.board[6] === state.board[7] && state.board[7] === state.board[8]) {
-    return state.board[6]
-  }
-  // "detects winning with the left column"
-  if (state.board[0] && state.board[0] === state.board[3] && state.board[3] === state.board[6]) {
-    return state.board[0]
-  }
-
-  // "detects winning with the middle column"
-  if (state.board[1] && state.board[1] === state.board[4] && state.board[4] === state.board[7]) {
-    return state.board[1]
-  }
-  // "detects winning with the right column"
-  if (state.board[2] && state.board[2] === state.board[5] && state.board[5] === state.board[8]) {
-    return state.board[2]
-  }
-  // "detects winning with the 0-4-8 diagonal"
-  if (state.board[0] && state.board[0] === state.board[4] && state.board[4] === state.board[8]) {
-    return state.board[0]
-  }
-  // "detects winning with the 2-4-6 diagonal"
-  if (state.board[2] && state.board[2] === state.board[4] && state.board[4] === state.board[6]) {
-    return state.board[2]
-  }
-
-  // I thought I needed these checks, but they are redundant after checking the empty board and each winning combo.
-  // If game is in progress aka no empty board, and there is no winning match, then we return null aka nobody won
-
-
-  // // no one has won yet
-
-  // // draw + full board
-  // if (state.board.every(cell => cell !== null)) {
-  //   return null
-  // }
-
-    return null
+  return null
 }
