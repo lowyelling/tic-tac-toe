@@ -9,6 +9,7 @@ export type Cell = Player | null;
 //  3 | 4 | 5
 //  ---------
 //  6 | 7 | 8
+
 export type Board = [Cell, Cell, Cell, Cell, Cell, Cell, Cell, Cell, Cell];
 
 export type GameState = {
@@ -76,15 +77,4 @@ export function getWinner(state: GameState): Player | null {
   }
 
   return null;
-}
-
-export function getWin(state: GameState): Player | null {
-  for (const [a, b, c] of WINNING_LINES) {
-    const cell = state.board[a] 
-    if (cell && cell === state.board[b] && cell === state.board[c]) {
-      return cell
-    }
-  }
-
-  return null
 }
