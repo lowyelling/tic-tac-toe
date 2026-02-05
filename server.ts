@@ -34,14 +34,11 @@ function createGameHandler(request: express.Request, response: express.Response)
 app.post('/api/create', createGameHandler)
 
 
-// // simple route test
-// app.get("/message", (request, response) => 
-//     response.send("Hello from express!"));
+// Get games from server 
+app.get("/api/games", (request, response) => {
+   response.json(Array.from(games.values()))
+})
 
-// Get game from server 
-// app.get("/api/game", (request, response) => {
-//    response.json(game)
-// })
 
 // // Post move to server - verified with Postman
 // app.post("/api/move", (request, response)=> {
