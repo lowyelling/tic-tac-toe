@@ -2,10 +2,17 @@ import express from "express";
 import ViteExpress from "vite-express";
 import { createGame, makeMove, getWinner } from "./src/tic-tac-toe";
 
-const app = express();
+export const app = express();
 const PORT = 3000;
 
 app.use(express.json())
+
+const games = new Map<string, ReturnType<typeof createGame>>()
+// without Typescript, would be new Map<string, GameState>()
+
+export function resetGamesforTest(){
+    games.clear()
+}
 
 let gameState = createGame() // make game upon initialization
 
@@ -26,6 +33,12 @@ app.post("/api/move", (request, response)=> {
 })
 
 // Create new game
+app.post('/api/create', (request, response) => {
+  gameState = createGame()
+  response.status(201).json(gameState)
+})
+
+// Reset game - to be rewritten!! need to separate game creation from game reset
 app.post('/api/game/reset', (request, response) => {
   gameState = createGame()
   response.json(gameState)
