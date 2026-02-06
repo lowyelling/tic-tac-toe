@@ -87,6 +87,9 @@ function App() {
         </div>
 
         <button onClick={()=> handleNewGame()}>Start new game</button>
+        <br />
+        <br />
+        <button onClick={()=> setGameState(null)}>Back to lobby</button>
         </>
     ) : (
       // LobbyView - gameState is null
