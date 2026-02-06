@@ -25,24 +25,28 @@ function App() {
   const [gameState, setGameState] = useState<GameState | null>(null)
   // console.log('gameList:', gameList)
 
-  useEffect(() => {
-     fetch('http://localhost:3000/api/games', {
+  function fetchGameList(){
+    fetch('http://localhost:3000/api/games', {
       method: 'GET'})
       .then(response => response.json())
       .then(data => setGameList(data)) 
       .catch(error => console.error('Error:', error))
-  },[])
+  }
+
+  useEffect(
+    () => fetchGameList(),
+  [])
 
    function handleNewGame(){
     fetch('http://localhost:3000/api/create', {
       method: 'POST'})
       // .then(response => {console.log('response:', response); return response.json()})
       .then(response => (
-        console.log('response:', response), // a bit unusual format, but works
+        // console.log('response:', response), // a bit unusual format, but works
         response.json()
       ))
       .then(data => (
-        console.log('data:', data),
+        // console.log('data:', data),
         setGameState(data),
         setGameList([...gameList, data])
         )) 
@@ -97,7 +101,7 @@ function App() {
         <button onClick={()=> handleNewGame()}>Start new game</button>
         <br />
         <br />
-        <button onClick={()=> setGameState(null)}>Back to lobby</button>
+        <button onClick={()=> {setGameState(null), fetchGameList()}}>Back to lobby</button>
         </>
     ) : (
       // LobbyView - gameState is null
@@ -133,6 +137,7 @@ function App() {
       )}
     </>
   )
+
 
 }
 
