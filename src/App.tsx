@@ -41,7 +41,7 @@ function App() {
   // console.log('gameList:', gameList)
 
   function fetchGameList(){
-    fetch('http://localhost:3000/api/games', {
+    fetch('api/games', {
       method: 'GET'})
       .then(response => response.json())
       .then(data => setGameList(data)) 
@@ -59,7 +59,7 @@ function App() {
   , []) // only run when gameState is null
 
 function fetchMoves(){
-    fetch('http://localhost:3000/api/games', {method: 'GET'})
+    fetch('api/games', {method: 'GET'})
       .then(response => (
           // console.log('response:', response),
           response.json())
@@ -84,7 +84,7 @@ function fetchMoves(){
 
 
    function handleNewGame(){
-    fetch('http://localhost:3000/api/create', {
+    fetch('api/create', {
       method: 'POST'})
       // .then(response => {console.log('response:', response); return response.json()})
       .then(response => (
@@ -101,7 +101,7 @@ function fetchMoves(){
 
   function handleCellClick(index: number){
      //setGameState(makeMove(gameState, index))
-     fetch('http://localhost:3000/api/move', {
+     fetch('api/move', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({ id: gameState?.id, position: index })
