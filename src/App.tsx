@@ -41,6 +41,12 @@ function App() {
       .catch(error => console.error('Error:', error))
   }
 
+  // function handleGameList(){
+  //   return (
+  //     gameList.map()
+  //   )
+  // }
+
   function handleCellClick(index: number){
      //setGameState(makeMove(gameState, index))
      fetch('http://localhost:3000/api/move', {
@@ -53,8 +59,6 @@ function App() {
       .catch(error => console.error('Error:', error))
      // console.log('gameState:', gameState) // async - new value not immediately available
   }
-
- 
 
   function Cell( {cell, index}: { cell: string | null, index: number} ) {
     return (
@@ -82,7 +86,9 @@ function App() {
         
         <div> 
           {getWinner(gameState) ? 
-          (<div>Winner: {getWinner(gameState)}</div>) : (<div>Current player: {gameState.currentPlayer}</div>)
+            (<div>Winner: {getWinner(gameState)}</div>) 
+          : 
+            (<div>Current player: {gameState.currentPlayer}</div>)
           }
         </div>
 
@@ -103,7 +109,17 @@ function App() {
           </>
         ) : (
           // There are games, so show buttons with the games
-          <p>Game List: TBD in next commit! </p>
+          <>
+            <h3>Game List</h3>
+            <div>
+              {gameList.map(function(game){
+                return (
+                  <div>{game.id}</div>
+                )
+              })
+              }
+            </div>
+          </>
         )}
         <button onClick={()=> handleNewGame()}>Start new game</button>
       </>
