@@ -65,9 +65,9 @@ function fetchMoves(){
           response.json())
         )
       .then((data: GameState[]) => {
-        console.log('data:', data)
+        // console.log('data:', data)
         const currentGame = data.find(game => game.id === gameState?.id)
-        console.log('currentGame:', currentGame)
+        // console.log('currentGame:', currentGame)
         setGameState(currentGame ?? null)
      })
   }
