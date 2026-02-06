@@ -11,7 +11,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "scratch": "node --experimental-strip-types scratch.ts",
-    "scratch:terminal": "node --experimental-strip-types scratch-terminal.ts"
+    "scratch:terminal": "node --experimental-strip-types scratch-terminal.ts",
+    "start": "NODE_ENV=production bun server.ts" 
   },
   "dependencies": {
     "@types/supertest": "^6.0.3",
