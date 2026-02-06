@@ -23,7 +23,7 @@ const cellStyle = {
 function App() {
   const [gameList, setGameList] = useState<GameState[]>([])
   const [gameState, setGameState] = useState<GameState | null>(null)
-  console.log('gameList:', gameList)
+  // console.log('gameList:', gameList)
 
   useEffect(() => {
      fetch('http://localhost:3000/api/games', {
@@ -36,16 +36,18 @@ function App() {
    function handleNewGame(){
     fetch('http://localhost:3000/api/create', {
       method: 'POST'})
-      .then(response => response.json())
-      .then(data => setGameState(data)) 
+      // .then(response => {console.log('response:', response); return response.json()})
+      .then(response => (
+        console.log('response:', response), // a bit unusual format, but works
+        response.json()
+      ))
+      .then(data => (
+        console.log('data:', data),
+        setGameState(data),
+        setGameList([...gameList, data])
+        )) 
       .catch(error => console.error('Error:', error))
   }
-
-  // function handleGameList(){
-  //   return (
-  //     gameList.map()
-  //   )
-  // }
 
   function handleCellClick(index: number){
      //setGameState(makeMove(gameState, index))
@@ -112,11 +114,16 @@ function App() {
           <>
             <h3>Game List</h3>
             <div>
-              {gameList.map(function(game){
+              {gameList.map(function(game, index){
                 return (
-                  <div>{game.id}</div>
+                  <div 
+                    key={game.id} 
+                    onClick={()=> setGameState(game)}
+                  >
+                    <p>Game {index+1}</p>
+                  </div>
                 )
-              })
+                })
               }
             </div>
           </>
@@ -127,12 +134,6 @@ function App() {
     </>
   )
 
-
-// // Initial state before fetch completes so component renders something that is then replaced immediately
-// function getInitialGame() {
-//   let initialGameState = createGame()
-//   return initialGameState
-// }
 }
 
 export default App;
