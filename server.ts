@@ -38,7 +38,7 @@ function moveHandler(request: express.Request, response: express.Response){
         return
     }
     const nextGame = makeMove(game, position)
-    games.set(id, game)
+    games.set(id, nextGame)
     response.json(nextGame)
 }
 
