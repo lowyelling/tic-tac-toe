@@ -48,9 +48,40 @@ function App() {
       .catch(error => console.error('Error:', error))
   }
 
-  useEffect(
-    () => fetchGameList(),
-  [])
+  useEffect( () => {
+    fetchGameList()
+    const interval = setInterval(
+        () => fetchGameList(),
+        1000 // return every second
+      )
+    return ()=> clearInterval(interval)
+    }
+  , []) // only run when gameState is null
+
+function fetchMoves(){
+    fetch('http://localhost:3000/api/games', {method: 'GET'})
+      .then(response => (
+          // console.log('response:', response),
+          response.json())
+        )
+      .then((data: GameState[]) => {
+        // console.log('data:', data)
+        const currentGame = data.find(game => game.id === gameState?.id)
+        // console.log('currentGame:', currentGame)
+        setGameState(currentGame ?? null)
+     })
+  }
+
+   useEffect( () => {
+    if (!gameState) return // not in game, skip
+    const interval = setInterval(
+        () => fetchMoves(),
+        1000 // return every second
+      )
+    return ()=> clearInterval(interval)
+    }
+  , [gameState]) // this is an issue, to be solved with useRef
+
 
    function handleNewGame(){
     fetch('http://localhost:3000/api/create', {
@@ -129,7 +160,7 @@ function App() {
             <p>Start a new game :)</p>
           </>
         ) : (
-          // There are games, so show buttons with the games
+          // Games exist - show list of games
           <>
             <h3>Game List</h3>
             <div style={gameListStyle}>

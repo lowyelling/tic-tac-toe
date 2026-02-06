@@ -3,10 +3,12 @@ import ViteExpress from "vite-express";
 import { createGame, makeMove, getWinner } from "./src/tic-tac-toe";
 import { randomUUID } from "crypto"
 
+
 export const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json())
+app.use(express.static('dist'))
 
 const games = new Map<string, ReturnType<typeof createGame>>()
 // without Typescript, would be new Map<string, game>()
