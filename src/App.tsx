@@ -20,6 +20,21 @@ const cellStyle = {
   textAlign: "center"
 } as const;
 
+const gameListStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(3,1fr)",
+  gap: "10px",
+  justifyContent: "center",
+  alignItems: "center",
+} as const
+
+const gameItemStyle = {
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  border: "1px solid black"
+} as const 
+
 function App() {
   const [gameList, setGameList] = useState<GameState[]>([])
   const [gameState, setGameState] = useState<GameState | null>(null)
@@ -117,12 +132,13 @@ function App() {
           // There are games, so show buttons with the games
           <>
             <h3>Game List</h3>
-            <div>
+            <div style={gameListStyle}>
               {gameList.map(function(game, index){
                 return (
                   <div 
                     key={game.id} 
                     onClick={()=> setGameState(game)}
+                    style={gameItemStyle}
                   >
                     <p>Game {index+1}</p>
                   </div>
