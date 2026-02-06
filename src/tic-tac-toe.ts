@@ -13,6 +13,7 @@ export type Cell = Player | null;
 export type Board = [Cell, Cell, Cell, Cell, Cell, Cell, Cell, Cell, Cell];
 
 export type GameState = {
+  id: string;
   board: Board;
   currentPlayer: Player;
 };
@@ -28,8 +29,9 @@ const WINNING_LINES: [number, number, number][] = [
   [2, 4, 6],
 ]
 
-export function createGame(): GameState {
+export function createGame(id: string): GameState {
   return {
+    id: id, //or shorthand: id,
     board: [null, null, null, null, null, null, null, null, null],
     currentPlayer: "X",
   };
@@ -61,6 +63,7 @@ export function makeMove(state: GameState, position: number): GameState {
   
   // define nextState and switch the player
   const nextState: GameState = {
+    id: state.id,
     board: nextBoard,
     currentPlayer: state.currentPlayer === "X" ? "O" : "X",
   }
