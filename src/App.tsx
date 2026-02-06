@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { type GameState, getWinner } from "./tic-tac-toe";
 import "./App.css"; 
 
@@ -39,6 +39,9 @@ function App() {
   const [gameList, setGameList] = useState<GameState[]>([])
   const [gameState, setGameState] = useState<GameState | null>(null)
   // console.log('gameList:', gameList)
+  const gameStateRef = useRef(gameState) // the box is created once
+  gameStateRef.current = gameState // gameState is always up-to-date, no re-render trigger
+  // freely write to the box
 
   function fetchGameList(){
     fetch('api/games', {
@@ -56,7 +59,7 @@ function App() {
       )
     return ()=> clearInterval(interval)
     }
-  , []) // only run when gameState is null
+  , []) // run on mount only
 
 function fetchMoves(){
     fetch('api/games', {method: 'GET'})
@@ -66,7 +69,7 @@ function fetchMoves(){
         )
       .then((data: GameState[]) => {
         // console.log('data:', data)
-        const currentGame = data.find(game => game.id === gameState?.id)
+        const currentGame = data.find(game => game.id === gameStateRef.current?.id) // interval reads latest gameState without useEffect needing to know about it!
         // console.log('currentGame:', currentGame)
         setGameState(currentGame ?? null)
      })
@@ -80,7 +83,9 @@ function fetchMoves(){
       )
     return ()=> clearInterval(interval)
     }
-  , [gameState]) // this is an issue, to be solved with useRef
+  , []) // removed gameState as second parameter/dependency array for useEffect
+  // interval needs gameState to prevent stale closures
+  // but with gameState included, the effect restarts every time it changes
 
 
    function handleNewGame(){
