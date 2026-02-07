@@ -45,12 +45,11 @@ const gameItemStyle = {
 function App() {
   const [gameList, setGameList] = useState<GameState[]>([])
   const [gameState, setGameState] = useState<GameState | null>(null)
+  //console.log('gameList:', gameList)
   const gameStateRef = useRef(gameState) // the box is created once
   gameStateRef.current = gameState // gameState is always up-to-date, no re-render trigger
   // freely write to the box
 
-
-  // Lobby polling - get game list
   function fetchGameList(){
     fetch('api/games', {
       method: 'GET'})
@@ -62,25 +61,27 @@ function App() {
   }
 
   useEffect( () => {
-    if (gameState) return // in game, skip lobby polling
-      fetchGameList()
-      const interval = setInterval(fetchGameList, 1000) // return every second
-      return ()=> clearInterval(interval)
+    fetchGameList()
+    const interval = setInterval(() => {
+      if (!gameStateRef.current) fetchGameList()
+      }, 1000) // return every second
+    return ()=> clearInterval(interval)
     }
-  , [gameState?.id]) // poll lobby only when not in a game
+  , []) // run on mount only
 
-  // Gameview polling - get moves 
-
-  function fetchMoves(){
+function fetchMoves(){
     fetch('api/games', {method: 'GET'})
       .then(response => (
+          // console.log('response:', response),
           response.json())
         )
       .then((data: GameState[]) => {
         const id = gameStateRef.current?.id
         if (!id) return
         console.log("hi I'm polling moves")
+        // console.log('data:', data)
         const currentGame = data.find(game => game.id === id) // interval reads latest gameState without useEffect needing to know about it!
+        // console.log('currentGame:', currentGame)
         setGameState(currentGame ?? null)
      })
       .catch(error => console.error('Error:', error))
@@ -102,10 +103,13 @@ function App() {
    function handleNewGame(){
     fetch('api/create', {
       method: 'POST'})
+      // .then(response => {console.log('response:', response); return response.json()})
       .then(response => (
+        // console.log('response:', response), // a bit unusual format, but works
         response.json()
       ))
       .then(data => (
+        // console.log('data:', data),
         setGameState(data),
         setGameList([...gameList, data])
         )) 
@@ -113,6 +117,7 @@ function App() {
   }
 
   function handleCellClick(index: number){
+     //setGameState(makeMove(gameState, index))
      fetch('api/move', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -121,6 +126,7 @@ function App() {
       .then(response => response.json())
       .then(data => setGameState(data)) 
       .catch(error => console.error('Error:', error))
+     // console.log('gameState:', gameState) // async - new value not immediately available
   }
 
   function Cell( {cell, index}: { cell: string | null, index: number} ) {

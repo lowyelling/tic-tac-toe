@@ -45,10 +45,6 @@ const gameItemStyle = {
 function App() {
   const [gameList, setGameList] = useState<GameState[]>([])
   const [gameState, setGameState] = useState<GameState | null>(null)
-  const gameStateRef = useRef(gameState) // the box is created once
-  gameStateRef.current = gameState // gameState is always up-to-date, no re-render trigger
-  // freely write to the box
-
 
   // Lobby polling - get game list
   function fetchGameList(){
@@ -71,33 +67,30 @@ function App() {
 
   // Gameview polling - get moves 
 
-  function fetchMoves(){
-    fetch('api/games', {method: 'GET'})
-      .then(response => (
-          response.json())
-        )
+  function fetchMoves(id: string) {
+    // `id` is a stable value for the current game session.
+    fetch('api/games', { method: 'GET' })
+      .then(r => r.json())
       .then((data: GameState[]) => {
-        const id = gameStateRef.current?.id
-        if (!id) return
-        console.log("hi I'm polling moves")
-        const currentGame = data.find(game => game.id === id) // interval reads latest gameState without useEffect needing to know about it!
+        const currentGame = data.find(game => game.id === id)
         setGameState(currentGame ?? null)
-     })
+      })
       .catch(error => console.error('Error:', error))
   }
 
-   useEffect( () => {
-    if (!gameState) return // not in game, skip
-    const interval = setInterval(
-        () => fetchMoves(),
-        1000 // return every second
-      )
-    return ()=> clearInterval(interval)
-    }
-  , [gameState?.id]) // removed gameState as second parameter/dependency array for useEffect...double bind here
-  // interval needs gameState to prevent stale closures
-  // but with gameState included, the effect restarts every time it changes
+  useEffect(() => {
+    const id = gameState?.id
+    if (!id) return
+    // The interval closes over `id`, not `gameState`.
+    // If we read `gameState` directly inside the interval callback,
+    // it would use the *render that created the interval* (stale).
+    fetchMoves(id)
+    const interval = setInterval(() => fetchMoves(id), 1000)
+    return () => clearInterval(interval)
+  }, [gameState?.id])
 
+
+  // game handlers
 
    function handleNewGame(){
     fetch('api/create', {
