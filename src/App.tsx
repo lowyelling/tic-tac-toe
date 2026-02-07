@@ -49,6 +49,8 @@ function App() {
   gameStateRef.current = gameState // gameState is always up-to-date, no re-render trigger
   // freely write to the box
 
+
+  // Lobby polling - get game list
   function fetchGameList(){
     fetch('api/games', {
       method: 'GET'})
@@ -60,15 +62,16 @@ function App() {
   }
 
   useEffect( () => {
-    fetchGameList()
-    const interval = setInterval(() => {
-      if (!gameStateRef.current) fetchGameList()
-      }, 1000) // return every second
-    return ()=> clearInterval(interval)
+    if (gameState) return // in game, skip lobby polling
+      fetchGameList()
+      const interval = setInterval(fetchGameList, 1000) // return every second
+      return ()=> clearInterval(interval)
     }
-  , []) // run on mount only
+  , [gameState?.id]) // poll lobby only when not in a game
 
-function fetchMoves(){
+  // Gameview polling - get moves 
+
+  function fetchMoves(){
     fetch('api/games', {method: 'GET'})
       .then(response => (
           response.json())
