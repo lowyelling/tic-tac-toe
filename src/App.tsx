@@ -38,7 +38,7 @@ const gameItemStyle = {
 function App() {
   const [gameList, setGameList] = useState<GameState[]>([])
   const [gameState, setGameState] = useState<GameState | null>(null)
-  // console.log('gameList:', gameList)
+  //console.log('gameList:', gameList)
   const gameStateRef = useRef(gameState) // the box is created once
   gameStateRef.current = gameState // gameState is always up-to-date, no re-render trigger
   // freely write to the box
@@ -47,16 +47,17 @@ function App() {
     fetch('api/games', {
       method: 'GET'})
       .then(response => response.json())
-      .then(data => setGameList(data)) 
+      .then(data => (
+        console.log('hi I fetched gameList'),
+        setGameList(data)))
       .catch(error => console.error('Error:', error))
   }
 
   useEffect( () => {
     fetchGameList()
-    const interval = setInterval(
-        () => fetchGameList(),
-        1000 // return every second
-      )
+    const interval = setInterval(() => {
+      if (!gameStateRef.current) fetchGameList()
+      }, 1000) // return every second
     return ()=> clearInterval(interval)
     }
   , []) // run on mount only
@@ -70,11 +71,13 @@ function fetchMoves(){
       .then((data: GameState[]) => {
         const id = gameStateRef.current?.id
         if (!id) return
+        console.log("hi I'm polling")
         // console.log('data:', data)
         const currentGame = data.find(game => game.id === id) // interval reads latest gameState without useEffect needing to know about it!
         // console.log('currentGame:', currentGame)
         setGameState(currentGame ?? null)
      })
+      .catch(error => console.error('Error:', error))
   }
 
    useEffect( () => {
@@ -85,7 +88,7 @@ function fetchMoves(){
       )
     return ()=> clearInterval(interval)
     }
-  , [gameState?.id]) // removed gameState as second parameter/dependency array for useEffect
+  , [gameState?.id]) // removed gameState as second parameter/dependency array for useEffect...double bind here
   // interval needs gameState to prevent stale closures
   // but with gameState included, the effect restarts every time it changes
 
