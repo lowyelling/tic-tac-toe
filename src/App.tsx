@@ -68,8 +68,10 @@ function fetchMoves(){
           response.json())
         )
       .then((data: GameState[]) => {
+        const id = gameStateRef.current?.id
+        if (!id) return
         // console.log('data:', data)
-        const currentGame = data.find(game => game.id === gameStateRef.current?.id) // interval reads latest gameState without useEffect needing to know about it!
+        const currentGame = data.find(game => game.id === id) // interval reads latest gameState without useEffect needing to know about it!
         // console.log('currentGame:', currentGame)
         setGameState(currentGame ?? null)
      })
@@ -83,7 +85,7 @@ function fetchMoves(){
       )
     return ()=> clearInterval(interval)
     }
-  , []) // removed gameState as second parameter/dependency array for useEffect
+  , [gameState?.id]) // removed gameState as second parameter/dependency array for useEffect
   // interval needs gameState to prevent stale closures
   // but with gameState included, the effect restarts every time it changes
 
