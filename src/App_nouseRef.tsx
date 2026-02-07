@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { type GameState, getWinner } from "./tic-tac-toe";
 import "./App.css"; 
 
