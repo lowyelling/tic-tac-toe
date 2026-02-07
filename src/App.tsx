@@ -22,17 +22,24 @@ const cellStyle = {
 
 const gameListStyle = {
   display: "grid",
-  gridTemplateColumns: "repeat(3,1fr)",
-  gap: "10px",
+  gridTemplateColumns: "repeat(3,100px)",
   justifyContent: "center",
   alignItems: "center",
+  gap: "5px",
+  width: "fit-content",
+  margin: "20px auto",
+  maxWidth: "330px"
 } as const
 
 const gameItemStyle = {
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  border: "1px solid black"
+  border: "1px solid black",
+  height: "100px",
+  width: "100px",
+  boxSizing: "border-box",
+  curser: "pointer"
 } as const 
 
 function App() {
@@ -162,7 +169,7 @@ function fetchMoves(){
     ) : (
       // LobbyView - gameState is null
       <>
-        <h1>Lobby</h1> 
+        <h1>Tic Tac Toe Lobby</h1> 
         { gameList.length === 0 ? (
           // No games - show start game text
           <>
@@ -172,7 +179,6 @@ function fetchMoves(){
         ) : (
           // Games exist - show list of games
           <>
-            <h3>Game List</h3>
             <div style={gameListStyle}>
               {gameList.map(function(game, index){
                 return (
