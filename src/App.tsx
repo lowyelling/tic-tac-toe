@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { type GameState, getWinner } from "./tic-tac-toe";
 import "./App.css"; 
 
@@ -22,41 +22,52 @@ const cellStyle = {
 
 const gameListStyle = {
   display: "grid",
-  gridTemplateColumns: "repeat(3,1fr)",
-  gap: "10px",
+  gridTemplateColumns: "repeat(3,100px)",
   justifyContent: "center",
   alignItems: "center",
+  gap: "5px",
+  width: "fit-content",
+  margin: "20px auto",
+  maxWidth: "330px"
 } as const
 
 const gameItemStyle = {
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  border: "1px solid black"
+  border: "1px solid black",
+  height: "100px",
+  width: "100px",
+  boxSizing: "border-box",
+  curser: "pointer"
 } as const 
 
 function App() {
   const [gameList, setGameList] = useState<GameState[]>([])
   const [gameState, setGameState] = useState<GameState | null>(null)
-  // console.log('gameList:', gameList)
+  //console.log('gameList:', gameList)
+  const gameStateRef = useRef(gameState) // the box is created once
+  gameStateRef.current = gameState // gameState is always up-to-date, no re-render trigger
+  // freely write to the box
 
   function fetchGameList(){
     fetch('api/games', {
       method: 'GET'})
       .then(response => response.json())
-      .then(data => setGameList(data)) 
+      .then(data => (
+        console.log('hi I fetched gameList'),
+        setGameList(data)))
       .catch(error => console.error('Error:', error))
   }
 
   useEffect( () => {
     fetchGameList()
-    const interval = setInterval(
-        () => fetchGameList(),
-        1000 // return every second
-      )
+    const interval = setInterval(() => {
+      if (!gameStateRef.current) fetchGameList()
+      }, 1000) // return every second
     return ()=> clearInterval(interval)
     }
-  , []) // only run when gameState is null
+  , []) // run on mount only
 
 function fetchMoves(){
     fetch('api/games', {method: 'GET'})
@@ -65,11 +76,15 @@ function fetchMoves(){
           response.json())
         )
       .then((data: GameState[]) => {
+        const id = gameStateRef.current?.id
+        if (!id) return
+        console.log("hi I'm polling")
         // console.log('data:', data)
-        const currentGame = data.find(game => game.id === gameState?.id)
+        const currentGame = data.find(game => game.id === id) // interval reads latest gameState without useEffect needing to know about it!
         // console.log('currentGame:', currentGame)
         setGameState(currentGame ?? null)
      })
+      .catch(error => console.error('Error:', error))
   }
 
    useEffect( () => {
@@ -80,7 +95,9 @@ function fetchMoves(){
       )
     return ()=> clearInterval(interval)
     }
-  , [gameState]) // this is an issue, to be solved with useRef
+  , [gameState?.id]) // removed gameState as second parameter/dependency array for useEffect...double bind here
+  // interval needs gameState to prevent stale closures
+  // but with gameState included, the effect restarts every time it changes
 
 
    function handleNewGame(){
@@ -152,7 +169,7 @@ function fetchMoves(){
     ) : (
       // LobbyView - gameState is null
       <>
-        <h1>Lobby</h1> 
+        <h1>Tic Tac Toe Lobby</h1> 
         { gameList.length === 0 ? (
           // No games - show start game text
           <>
@@ -162,7 +179,6 @@ function fetchMoves(){
         ) : (
           // Games exist - show list of games
           <>
-            <h3>Game List</h3>
             <div style={gameListStyle}>
               {gameList.map(function(game, index){
                 return (
